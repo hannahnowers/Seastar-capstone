@@ -1,0 +1,46 @@
+---
+title: "02-annotating-sunflower-genes"
+author: "Hannah Nowers"
+date: "2026-01-20"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{bash, Setupn and Query Sequence}
+
+cd ../data
+pwd
+
+curl -O https://gannet.fish.washington.edu/seashell/bu-github/paper-pycno-sswd-2021-2022/data/augustus.hints.codingseq #downloading query seq
+
+mv augustus.hints.codingseq pycnopodia.helianthoides.genes.fa # renaming data file
+
+head -n 5 pycnopodia.helianthoides.genes.fa #Looking at the start of my query sequence
+
+echo "How many sequences are there?" #echo prints the follow line into terminal, this labels the ouput so you know what the number refers to
+
+grep -c ">" ../data/pycnopodia.helianthoides.genes.fa # grep-> searches for patterns in a file, -c -> counts the number of lines that match, ">" looks for the > characters(FASTA headings), Ab_4denovo_CLC6_a.fa is telling it which files to search. Overall, looking for the number of lines that start with > which tells it the number of sequences
+```
+
+
+```{bash, Running Blast}
+
+#Now I need to run my query seq(pycnopodia.helianthoides.genes) through the blast db
+#bin -> is the folder that contains the blast executables
+
+~/GitHub/Github-Practice/Data/ncbi-blast-2.17.0+/bin/blastx \
+-query ../../seastar-capstone/data/pycnopodia.helianthoides.genes.fa \
+-db ../../Github-Practice/blastdb/uniprot_sprot_r2023_01 \
+-out ../../Seastar-capstone/output/pycnopodia_gene_blastx.tab \
+-evalue 1E-20 \
+-num_threads 20 \
+-max_target_seqs 1 \
+-outfmt 6 #line 1: tells it what version of Blast, what bin, and what executable I want to use, blastx tales the DNA/RNA sequences translates them into proteins and searches the protein database, second line: -query specifies the sequence I want to search the trailing bit just tell it where the file is, third line: tell it what database to search against trailing bit tell is where the database is, fourth line: tells blast where to save the results, fifth line: -evalue -> sets the expectation value cutoff, means BLAST with only report hit thats have a 1E-20 probability of occuring, sixth line: -num_threads -> tells the computer how many CPU threads to use, run 20 threads in parallel which speeds up searching, seventh line: -max_target_seqs: limits how many top hits BLAST reports for each query, 1 -> only the best hit per query sequence will be saved, eighth line: -outfmt sets the ouput format, 6= table format
+
+head -2 ../output/pycnopodia_gene_blastx.tab
+wc -l ../output/pycnopodia_gene_blastx.tab
+```
+
