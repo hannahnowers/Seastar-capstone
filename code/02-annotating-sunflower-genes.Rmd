@@ -44,3 +44,59 @@ head -2 ../output/pycnopodia_gene_blastx.tab
 wc -l ../output/pycnopodia_gene_blastx.tab
 ```
 
+```{bash, Checking Data}
+head -2 ../output/pycnopodia_gene_blastx.tab
+wc -l ../output/pycnopodia_gene_blastx.tab
+
+curl -O -H "Accept: text/plain; format=tsv" "https://rest.uniprot.org/uniprotkb/stream?compressed=true&fields=accession%2Creviewed%2Cid%2Cprotein_name%2Cgene_names%2Corganism_name%2Clength%2Cgo&format=tsv&query=%28*%29+AND+%28reviewed%3Atrue%29" #link with additional gene information, -H returns the correct file format
+
+pwd
+
+mv "stream" ../data/uniprot_table_r2023_01.tab ../data/uniprot_table_r2023_01.tab.gz #renaming and moving for later use
+
+gunzip ../data/uniprot_table_r2023_01.tab.gz #unzipping file
+
+```
+```{bash, Joining blast table with annotation table}
+
+head -2 ../output/pycnopodia_gene_blastx.tab # checking the first two lines of my blast table
+wc -l ../output/pycnopodia_gene_blastx.tab # wc-> word count, -1 <- count one line
+```
+```{bash, joining tables continued}
+
+sed 's/|/\t/g' ../output/pycnopodia_gene_blastx.tab \
+> ../output/pycnopodia-uniprot_blastx_sep.tab #first line: sed 's/|/\t/g'-> mean translate and replace every \ with a tab, Second line: > means put Ab_4-uniprot_blastx.tab through the translation, replacing | with tab and then making a new file Ab_4-uniprot_blastx_sep.tab
+
+pwd
+
+head -2 ../data/uniprot_table_r2023_01.tab # Checking what it looks like
+wc -l ../data/uniprot_table_r2023_01.tab # checking the word count on the first line
+
+
+```
+
+```{r, installing packages and making table}
+install.packages("tidyverse")
+install.packages("kableExtra")
+
+library(tidyverse)
+library(kableExtra)
+
+bltabl <- read.csv("../output/pycnopodia-uniprot_blastx_sep.tab", sep = '\t', header = FALSE) #blast table
+spgo <- read.csv("../data/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE) # annotation table
+str(spgo)
+
+names(spgo) # Seeing exactly what R has named the columns
+
+kbl(
+head(
+  left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+  select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..GO.) %>% mutate(V1 = str_replace_all(V1, 
+            pattern = "solid0078_20110412_FRAG_BC_WHITE_WHITE_F3_QV_SE_trimmed", replacement = "Ab"))
+)
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+
+```
