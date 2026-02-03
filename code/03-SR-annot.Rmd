@@ -4,19 +4,26 @@ output: html_document
 date: "2026-02-03"
 ---
 
+
+```{r}
+library(tidyverse)
+```
+
+
+
+
 ```{bash}
 head -2 ../output/pycnopodia_gene_blastx.tab
 wc -l ../output/pycnopodia_gene_blastx.tab
 ```
 
 
-
-
-
 ```{bash}
-cd ../data
-curl -O -H "https://rest.uniprot.org/uniprotkb/stream?compressed=true&fields=accession%2Creviewed%2Cid%2Cprotein_name%2Cgene_names%2Corganism_name%2Clength%2Cgo_p%2Cgo_id%2Cgo%2Cgo_f%2Cgo_c%2Cft_motif%2Cprotein_families%2Cxref_interpro&format=tsv&query=%28*%29+AND+%28reviewed%3Atrue%29"
+cd ../data 
+curl -O https://gannet.fish.washington.edu/seashell/snaps/uniprotkb_AND_reviewed_true_2026_02_03.tsv
 ```
+
+
 
 
 
@@ -24,7 +31,7 @@ curl -O -H "https://rest.uniprot.org/uniprotkb/stream?compressed=true&fields=acc
 
 
 ```{bash}
-head ../data/stream
+head -2 ../data/uniprotkb_GO.tsv
 ```
 
 
@@ -45,13 +52,14 @@ head -2 ../output/pycnopodia-uniprot_blastx_sep.tab
 
 ```{r}
 bltabl <- read.csv("../output/pycnopodia-uniprot_blastx_sep.tab", sep = '\t', header = FALSE) #blast table
-spgo <- read.csv("../data/uniprot_table_r2023_01.tab", sep = '\t', header = TRUE) # annotation table
-str(spgo)
-
-names(spgo) # Seeing exactly what R has named the columns
-
-pynco-annot <- left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
-select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..GO.) 
-
+spgo <- read.csv("../data/uniprotkb_GO.tsv", sep = '\t', header = TRUE) # annotation table
 ```
+
+```{r}
+pyncoannot <- left_join(bltabl, spgo,  by = c("V3" = "Entry")) %>%
+select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process.) 
+```
+
+
+
 
