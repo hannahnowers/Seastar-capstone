@@ -1,0 +1,189 @@
+---
+title: "05-Manual-Annotation"
+author: "Hannah Nowers"
+date: "2026-02-19"
+output: pdf_document
+---
+## Creating Annotation Table for Dermasterias Proteins
+
+```{bash}
+
+head -2 ../data/uniprotkb_GO.tsv #Taking a look at my unirprot table
+
+pwd
+
+cd ..
+
+pwd
+
+head -n 5 data/derm-protein.fa # Taking a look at the first 5 rows of my protien seq
+
+
+```
+
+#Running my derm-protein query seq through the db
+```{bash}
+
+~/GitHub/Github-Practice/Data/ncbi-blast-2.17.0+/bin/blastp \
+-query ../../seastar-capstone/data/derm-protein.fa \
+-db ../../Github-Practice/blastdb/uniprot_sprot_r2023_01 \
+-out ../../Seastar-capstone/output/derm_gene_blastx.tab \
+-evalue 1E-20 \
+-num_threads 8 \
+-max_target_seqs 1 \
+-outfmt 6
+
+```
+
+#Taking a look at my table and cleaning it
+```{bash}
+
+head -2 ../output/derm_gene_blastx.tab
+wc -l ../output/derm_gene_blastx.tab
+
+sed 's/|/\t/g' ../output/derm_gene_blastx.tab \
+> ../output/derm-uniprot_blastx_sep.tab #first line: sed 's/|/\t/g'-> mean translate and replace every \ with a tab, Second line: > means put Ab_4-uniprot_blastx.tab through the translation, replacing | with tab and then making a new file Ab_4-uniprot_blastx_sep.tab
+
+head -2 ../output/derm-uniprot_blastx_sep.tab
+
+```
+# Join Tables in R
+
+```{r}
+
+bltabl_derm_gene <- read.csv("../output/derm-uniprot_blastx_sep.tab", sep = '\t', header = FALSE) #blast table
+spgo <- read.csv("../data/uniprotkb_GO.tsv", sep = '\t', header = TRUE) # annotation table
+
+```
+
+# Annotation Table Creation
+```{r}
+
+derm_annot <- left_join(bltabl_derm_gene, spgo,  by = c("V3" = "Entry")) %>%
+select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process.) 
+
+```
+
+
+## Annotation Table for Pisaster Protiens
+
+#Checking my Data
+```{bash}
+
+pwd 
+cd ..
+head -n 5 data/pisaster-protein.fa # Taking a look at the first 5 rows of my protein seq
+
+
+```
+
+#Running my pisaster-protein query seq through the db
+```{bash}
+
+~/GitHub/Github-Practice/Data/ncbi-blast-2.17.0+/bin/blastp \
+-query ../../seastar-capstone/data/pisaster-protein.fa \
+-db ../../Github-Practice/blastdb/uniprot_sprot_r2023_01 \
+-out ../../Seastar-capstone/output/pisaster_gene_blastx.tab \
+-evalue 1E-20 \
+-num_threads 8 \
+-max_target_seqs 1 \
+-outfmt 6
+
+```
+
+
+#Taking a look at my Pisaster table and cleaning it
+```{bash}
+
+head -2 ../output/pisaster_gene_blastx.tab
+wc -l ../output/pisaster_gene_blastx.tab
+
+sed 's/|/\t/g' ../output/pisaster_gene_blastx.tab \
+> ../output/pisaster-uniprot_blastx_sep.tab #first line: sed 's/|/\t/g'-> mean translate and replace every \ with a tab, Second line: > means put Ab_4-uniprot_blastx.tab through the translation, replacing | with tab and then making a new file Ab_4-uniprot_blastx_sep.tab
+
+head -2 ../output/pisaster-uniprot_blastx_sep.tab
+
+```
+
+# Join Tables in R
+
+```{r}
+
+bltabl_pisaster_gene <- read.csv("../output/pisaster-uniprot_blastx_sep.tab", sep = '\t', header = FALSE) #blast table
+spgo <- read.csv("../data/uniprotkb_GO.tsv", sep = '\t', header = TRUE) # annotation table
+
+```
+
+# Annotation Table for Pisaster Creation
+```{r}
+
+pisaster_annot <- left_join(bltabl_pisaster_gene, spgo,  by = c("V3" = "Entry")) %>%
+select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process.) 
+
+```
+
+
+##Creating Annotation Table for Dermasterias Proteins
+```{bash}
+
+head -2 ../data/uniprotkb_GO.tsv #Taking a look at my unirprot table
+
+pwd
+
+cd ..
+
+pwd
+
+head -n 5 data/pycno-protein.fa # Taking a look at the first 5 rows of my protien seq
+
+
+```
+
+#Running pycno-protein query seq through the db
+```{bash}
+
+~/GitHub/Github-Practice/Data/ncbi-blast-2.17.0+/bin/blastp \
+-query ../../seastar-capstone/data/pycno-protein.fa \
+-db ../../Github-Practice/blastdb/uniprot_sprot_r2023_01 \
+-out ../../Seastar-capstone/output/pycno_gene_blastx.tab \
+-evalue 1E-20 \
+-num_threads 8 \
+-max_target_seqs 1 \
+-outfmt 6
+
+```
+
+#Taking a look at my pycno table and cleaning it
+```{bash}
+
+head -2 ../output/pycno_gene_blastx.tab
+wc -l ../output/pycno_gene_blastx.tab
+
+sed 's/|/\t/g' ../output/pycno_gene_blastx.tab \
+> ../output/pycno-uniprot_blastx_sep.tab #first line: sed 's/|/\t/g'-> mean translate and replace every \ with a tab, Second line: > means put Ab_4-uniprot_blastx.tab through the translation, replacing | with tab and then making a new file Ab_4-uniprot_blastx_sep.tab
+
+head -2 ../output/pycno-uniprot_blastx_sep.tab
+
+```
+
+
+```{r}
+
+bltabl_pycno_gene <- read.csv("../output/pycno-uniprot_blastx_sep.tab", sep = '\t', header = FALSE) #blast table
+spgo <- read.csv("../data/uniprotkb_GO.tsv", sep = '\t', header = TRUE) # annotation table
+```
+
+# Annotation Table Creation
+```{r}
+pycno_annot <- left_join(bltabl_pycno_gene, spgo,  by = c("V3" = "Entry")) %>%
+select(V1, V3, V13, Protein.names, Organism, Gene.Ontology..biological.process.) 
+
+```
+
+
+```{bash}
+
+git push origin main
+
+
+```
