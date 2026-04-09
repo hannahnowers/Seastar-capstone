@@ -14,35 +14,156 @@ library(dplyr)
 
 ```{r, Loading in Dataset}
 
-# Creating data file
+# Creating data files
 pisaster_anot <- read_tsv("output/pisaster_protein_annotation/annotation_with_goslim.tsv")
+derm_anot <- read_tsv("output/derm_protein_annotation/annotation_with_goslim.tsv")
+pycno_anot <- read_tsv("output/pycno_protein_annotation/annotation_with_goslim.tsv")
 
 #Checking first rows of file
 head(pisaster_anot)
+head(derm_anot)
+head(pycno_anot)
 
 ```
 
 ```{r, Cleaning Data}
 
 #Cleaning Dataset
-pisaster_slim <- pisaster_anot %>% select(query, goslim_names) #Creating data file with only query and goslim_names (look at query v accession number)
+#pisaster_slim <- pisaster_anot %>% select(query, goslim_names) #Creating data file with only query and goslim_names (look at query v accession number)
 
 #Removing empty rows
-pisaster_slim <- pisaster_slim %>% filter(!is.na(goslim_names)) #Removing the empty values. From the summary.md file can see that only 31.1% of terms mapped with Go Slim terms to lots of empty values in data set
+#pisaster_slim <- pisaster_slim %>% filter(!is.na(goslim_names)) #Removing the empty values. From the summary.md file can see that only 31.1% of terms mapped with Go Slim terms to lots of empty values in data set
 
 #Seperating Go-Slim terms into seperate rows and removing duplicates
-pisaster_slim <- pisaster_slim %>% separate_rows(goslim_names, sep = ";") #Since there are multiple goslim terms per query need to seperate them
+#pisaster_slim <- pisaster_slim %>% separate_rows(goslim_names, sep = ";") #Since there are multiple goslim terms per query need to seperate them
 
 #Trim Extra spaces
-pisaster_slim$goslim_names <- trimws(pisaster_slim$goslim_names) #Some of the go-slim terms may have extra spaces infront of them
+#pisaster_slim$goslim_names <- trimws(pisaster_slim$goslim_names) #Some of the go-slim terms may have extra spaces infront of them
 
 #Remove duplicates
-pisaster_slim <- pisaster_slim %>% distinct(query, goslim_names) #Since multiple hits per query need to remove duplicates
+#pisaster_slim <- pisaster_slim %>% distinct(query, goslim_names) #Since multiple hits per query need to remove duplicates
 
 #Count sequences per Go Category
-pisaster_counts <- pisaster_slim %>% count(goslim_names, sort=TRUE) #Checking Does this match summary.md file for pisaster. There should be multiple hits for each query so need to make sure numbers match
+#pisaster_counts <- pisaster_slim %>% count(goslim_names, sort=TRUE) #Checking Does this match summary.md file for pisaster. There should be multiple hits for each query so need to make sure numbers match
 
-top15 <- pisaster_counts %>%
-  slice_max(n, n = 15) #Not showing the same categories
+#top15 <- pisaster_counts %>%
+  #slice_max(n, n = 15) #Not showing the same categories
+
+```
+
+
+```{r, Working Backwards for Pisaster}
+
+
+#I know what top 15 terms are produced by the summary.md file so figured I'd try to work backwards and just tell it to find those terms. However, I don't think this method solves any problems I might have with further data analysis. 
+
+goslim_terms_pisaster <- c(
+  "anatomical structure development",
+  "cell differentiation",
+  "regulation of DNA-templated transcription",
+  "cytoskeleton organization",
+  "protein-containing complex assembly",
+  "immune system process",
+  "muscle system process",
+  "reproductive process",
+  "vesicle-mediated transport",
+  "lipid metabolic process",
+  "cell motility",
+  "nervous system process",
+  "programmed cell death",
+  "cell adhesion",
+  "transmembrane transport"
+)
+
+pisaster_filtered_counts <- pisaster_anot %>% #telling it what datset to use
+  separate_rows(goslim_names, sep = ";") %>%
+  mutate(goslim_names = trimws(goslim_names)) %>%
+  filter(goslim_names %in% goslim_terms_pisaster) %>%
+  count(goslim_names, sort = TRUE)
+
+pisaster_filtered_counts <- pisaster_filtered_counts %>% mutate(species = "Pisaster")
+
+print(pisaster_filtered_counts)
+
+```
+
+```{r, bar chart for pisaster}
+
+#barplot
+ggplot(pisaster_filtered_counts, aes(x= goslim_names, y= n)) + geom_bar(stat = "identity", fill = "blue") + coord_flip() + labs( x = "Go Ontology Slim Term", y = "Number of Sequences", title = "Pisaster Go Slim Ontology")
+
+```
+
+```{r, working backwards for derm}
+
+goslim_terms_derm <- c(
+  "anatomical structure development",
+  "cell differentiation",
+  "regulation of DNA-templated transcription",
+  "reproductive process",
+  "vesicle-mediated transport",
+  "cytoskeleton organization",
+  "lipid metabolic process",
+  "immune system process",
+  "nervous system process",
+  "cell motility",
+  "cell adhesion",
+  "transmembrane transport",
+  "programmed cell death",
+  "signaling",
+  "protein-containing complex assembly"
+)
+
+derm_filtered_counts <- derm_anot %>% #telling it what datset to use
+  separate_rows(goslim_names, sep = ";") %>%
+  mutate(goslim_names = trimws(goslim_names)) %>%
+  filter(goslim_names %in% goslim_terms_derm) %>%
+  count(goslim_names, sort = TRUE)
+
+derm_filtered_counts <- derm_filtered_counts %>% mutate(species = "Dermasterias")
+
+print(derm_filtered_counts)
+
+
+#barplot
+ggplot(derm_filtered_counts, aes(x= goslim_names, y= n)) + geom_bar(stat = "identity", fill = "blue") + coord_flip() + labs( x = "Go Ontology Slim Term", y = "Number of Sequences", title = "Dermasterias Go Slim Ontology")
+
+```
+
+
+```{r, Working Backwards for Pycno}
+
+goslim_terms_pycno <- c(
+  "anatomical structure development",
+  "cell differentiation",
+  "regulation of DNA-templated transcription",
+  "reproductive process",
+  "nervous system process",
+  "protein-containing complex assembly",
+  "cytoskeleton organization",
+  "vesicle-mediated transport",
+  "immune system process",
+  "lipid metabolic process",
+  "cell motility",
+  "cell adhesion",
+  "transmembrane transport",
+  "programmed cell death",
+  "protein catabolic process"
+)
+
+pycno_filtered_counts <- pycno_anot %>% #telling it what datset to use
+  separate_rows(goslim_names, sep = ";") %>%
+  mutate(goslim_names = trimws(goslim_names)) %>%
+  filter(goslim_names %in% goslim_terms_derm) %>%
+  count(goslim_names, sort = TRUE)
+
+pycno_filtered_counts <- pycno_filtered_counts %>% mutate(species = "Pycnopodia")
+
+print(pycno_filtered_counts)
+
+
+#barplot
+ggplot(pycno_filtered_counts, aes(x= goslim_names, y= n)) + geom_bar(stat = "identity", fill = "blue") + coord_flip() + scale_y_continuous(limits = c(0, 3100)) + labs( x = "Go Ontology Slim Term", y = "Number of Sequences", title = "Pycnopodia Go Slim Ontology")
+
 
 ```

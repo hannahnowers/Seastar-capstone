@@ -1,0 +1,263 @@
+---
+title: "07-GoSlim_Counts"
+output: html_document
+date: "2026-03-26"
+---
+
+```{R, Loading Software}
+library(dplyr)
+library(tidyr)
+library(stringr)
+```
+
+### Pie Charts and Table with Full Go Slim Terms
+
+```{r, Loading Data into Environment}
+
+# Creating data files
+pisaster_anot <- read_tsv("output/pisaster_protein_annotation/annotation_with_goslim.tsv")
+derm_anot <- read_tsv("output/derm_protein_annotation/annotation_with_goslim.tsv")
+pycno_anot <- read_tsv("output/pycno_protein_annotation/annotation_with_goslim.tsv")
+
+#Checking first rows of file
+head(pisaster_anot)
+head(derm_anot)
+head(pycno_anot)
+
+```
+
+```{r, Cleaning and Data Counting for Derm}
+
+derm_full_count <- derm_anot %>%
+  separate_rows(goslim_names, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(goslim_names = str_trim(goslim_names)) %>% #Trimming the white space
+  filter(!is.na(goslim_names), goslim_names != "") %>% # Removing the empty rows
+  distinct(query, goslim_names) %>% # There are multiple hits per query, I don't want the duplicates
+  count(goslim_names, sort = TRUE) # counting the go_slim counts for each name
+
+print(derm_full_count)
+
+
+pie(
+  derm_full_count$n,
+  labels = derm_full_count$goslim_names,
+  main = "GO Slim Distribution (Dermasterias)" # Pie chart with just whole overview. Useless but figured I'd do it before trimming it down
+)
+
+
+derm_top15 <- derm_full_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  derm_top15$n,
+  labels = derm_top15$goslim_names,
+  main = "Top 15 Go Slim Terms for Derm"
+)
+
+```
+
+
+
+```{r,Cleaning and Data Counting for Pisaster}
+
+pisaster_full_count <- pisaster_anot %>%
+  separate_rows(goslim_names, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(goslim_names = str_trim(goslim_names)) %>% #Trimming the white space
+  filter(!is.na(goslim_names), goslim_names != "") %>% # Removing the empty rows
+  distinct(query, goslim_names) %>% # There are multiple hits per query, I don't want the duplicates
+  count(goslim_names, sort = TRUE) # counting the go_slim counts for each name
+
+print(pisaster_full_count)
+
+pisa_top15 <- pisaster_full_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  pisa_top15$n,
+  labels = pisa_top15$goslim_names,
+  main = "Top 15 Go Slim Terms for Pisaster"
+)
+
+```
+
+```{r,Cleaning and Data Counting for Pycno}
+
+pycno_full_count <- pycno_anot %>%
+  separate_rows(goslim_names, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(goslim_names = str_trim(goslim_names)) %>% #Trimming the white space
+  filter(!is.na(goslim_names), goslim_names != "") %>% # Removing the empty rows
+  distinct(query, goslim_names) %>% # There are multiple hits per query, I don't want the duplicates
+  count(goslim_names, sort = TRUE) # counting the go_slim counts for each name
+
+print(pycno_full_count)
+
+pycno_top15 <- pycno_full_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  pycno_top15$n,
+  labels = pycno_top15$goslim_names,
+  main = "Top 15 Go Slim Terms for Pycnopodia"
+)
+
+```
+
+### Pie Charts and Tables for BPs
+
+```{r, Derm Table and Pie Chart for Bps}
+
+derm_bp_count <- derm_anot %>%
+  separate_rows(go_bp, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(go_bp = str_trim(go_bp)) %>% #Trimming the white space
+  filter(!is.na(go_bp), go_bp != "") %>% # Removing the empty rows
+  distinct(query, go_bp) %>% # There are multiple hits per query, I don't want the duplicates
+  count(go_bp, sort = TRUE) %>% # counting the go_slim counts for each name
+  mutate(species = "dermasterias")
+
+print(derm_bp_count)
+
+
+derm_bp_top15 <- derm_bp_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  derm_bp_top15$n,
+  labels = derm_bp_top15$go_bp,
+  main = "Top 15 Go BP Terms for Derm",
+   cex = 0.5
+)
+
+```
+
+```{r, Pisaster Table and Pie Chart for Bps}
+
+pisaster_bp_count <- pisaster_anot %>%
+  separate_rows(go_bp, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(go_bp = str_trim(go_bp)) %>% #Trimming the white space
+  filter(!is.na(go_bp), go_bp != "") %>% # Removing the empty rows
+  distinct(query, go_bp) %>% # There are multiple hits per query, I don't want the duplicates
+  count(go_bp, sort = TRUE) %>% # counting the go_slim counts for each name
+  mutate(species = "pisaster")
+
+print(pisaster_bp_count)
+
+
+pisaster_bp_top15 <- pisaster_bp_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  pisaster_bp_top15$n,
+  labels = pisaster_bp_top15$go_bp,
+  main = "Top 15 Go BP Terms for Pisaster",
+  cex = 0.5
+)
+
+```
+
+
+```{r, Pycno Table and Pie Chart for Bps}
+
+pycno_bp_count <- pycno_anot %>%
+  separate_rows(go_bp, sep = ";") %>% # seperating the go slim names that are all together in the columns
+  mutate(go_bp = str_trim(go_bp)) %>% #Trimming the white space
+  filter(!is.na(go_bp), go_bp != "") %>% # Removing the empty rows
+  distinct(query, go_bp) %>% # There are multiple hits per query, I don't want the duplicates
+  count(go_bp, sort = TRUE) %>% # counting the go_slim counts for each name
+  mutate(species = "pycnopodia")
+
+print(pycno_bp_count)
+
+
+pycno_bp_top15 <- pycno_bp_count %>% #need to make my pie chart readable just as a starting point. Creating data frame with top 15 terms so I can create a pie chart w/ just the 15 terms
+  slice_head(n=15)
+
+pie(
+  pycno_bp_top15$n,
+  labels = pycno_bp_top15$go_bp,
+  main = "Top 15 Go BP Terms for Pycno",
+  cex = 0.5
+)
+
+```
+
+
+```{r, Making Contigency Table}
+
+combined_bps <- bind_rows(derm_bp_count,pisaster_bp_count, pycno_bp_count) # combining the counts for the go_bp slims for the three species to prepare for chi-squared test
+
+combined_bps_with0s <- combined_bps %>% # Making sure the terms that aren't consistent across the species are represented by zeros
+  complete(species, go_bp, fill = list(n=0))
+
+
+contingency_table <- combined_bps_with0s %>% #Changing my table from long to wide format in order to make my contigency table
+  pivot_wider(
+    names_from = species,
+    values_from = n,
+    values_fill = 0 # When a count is missing for a term, it fills it with 0.
+  )
+
+contingency_matrix <- contingency_table %>% # Making the contigency matrix to run my chi-squared test for independence
+  column_to_rownames("go_bp") %>%
+  as.matrix()
+
+sum(contingency_matrix < 5) # Checking how many of my counts are fewer than 5, This is an assumption for a chi-squared test (19726)
+
+mean(contingency_matrix < 5) # looking at the proportion that is fewer than 5 (67.4%)
+
+```
+
+
+```{r, Chi-squared Test}
+
+chisq.test(contingency_matrix) # Running the chi-squared. Not significant result. 
+
+```
+
+
+```{r, Chi-Squared Test With "other" category}
+
+derm_bp_count_other<-derm_bp_count %>%
+  mutate(go_bp = ifelse(n < 5, "Other", go_bp)) %>%
+  group_by(go_bp) %>%
+  summarise(n = sum(n), .groups = "drop") %>%
+  mutate(species = "derm")
+
+
+pisaster_bp_count_other <- pisaster_bp_count %>%
+  mutate(go_bp = ifelse(n < 5, "Other", go_bp)) %>%
+  group_by(go_bp) %>%
+  summarise(n = sum(n), .groups = "drop") %>%
+  mutate(species = "pisaster")
+
+pycno_bp_count_other<- pycno_bp_count %>%
+  mutate(go_bp = ifelse(n < 5, "Other", go_bp)) %>%
+  group_by(go_bp) %>%
+  summarise(n = sum(n), .groups = "drop") %>%
+  mutate(species = "pycnopodia")
+
+combined_bps_other <- bind_rows(derm_bp_count_other,pisaster_bp_count_other, pycno_bp_count_other) # combining the counts for the go_bp slims for the three species to prepare for chi-squared test
+
+combined_bps_with0s_other <- combined_bps_other %>% # Making sure the terms that aren't consistent across the species are represented by zeros
+  complete(species, go_bp, fill = list(n=0))
+
+
+contingency_table_other <- combined_bps_with0s_other %>% #Changing my table from long to wide format in order to make my contigency table
+  pivot_wider(
+    names_from = species,
+    values_from = n,
+    values_fill = 0 # When a count is missing for a term, it fills it with 0.
+  )
+
+contingency_matrix_other <- contingency_table_other %>% # Making the contigency matrix to run my chi-squared test for independence
+  column_to_rownames("go_bp") %>%
+  as.matrix()
+
+sum(contingency_matrix_other < 5) # Checking how many of my counts are fewer than 5, This is an assumption for a chi-squared test (19726)
+
+mean(contingency_matrix_other < 5) # looking at the proportion that is fewer than 5 (67.4%)
+
+other_chi <- chisq.test(contingency_matrix_other)
+
+# Standardized residuals
+other_chi$stdres
+```
