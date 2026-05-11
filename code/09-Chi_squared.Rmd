@@ -4,26 +4,100 @@ output: html_document
 date: "2026-04-12"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r,Loading in Software}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(tidyverse)
 ```
 
-## R Markdown
+```{r, Table for Analysis}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#Reading in Data Files
+derm_count <- read.csv("~/Seastar-capstone/output/derm_full_count.csv")
+pisaster_count <- read.csv("~/Seastar-capstone/output/pisaster_full_count.csv")
+pycno_count <- read.csv("~/Seastar-capstone/output/pycno_full_count.csv")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Editing Data files for specific terms
 
-```{r cars}
-summary(cars)
+terms <- c(
+  "anatomical structure development",
+  "antioxidant activity",
+  "carbohydrate metabolic process",
+  "cell differentiation",
+  "circulatory system process",
+  "cytokinesis",
+  "defense response to other organism",
+  "detoxification",
+  "digestive system process",
+  "endocrine process",
+  "extracellular matrix organization",
+  "immune system process",
+  "inflammatory response",
+  "lipid binding",
+  "muscle system process",
+  "nervous system process",
+  "reproductive process",
+  "toxin activity",
+  "virus receptor activity",
+  "wound healing"
+)
+
+
+derm_clean <- derm_count %>%
+  mutate(goslim_names = str_trim(goslim_names)) %>%  # clean spaces
+  filter(goslim_names %in% terms) %>%
+  complete(goslim_names = terms, fill = list(n = 0)) %>%
+  mutate(species = "dermasterias")
+
+pisaster_clean <- pisaster_count %>%
+  mutate(goslim_names = str_trim(goslim_names)) %>%  # clean spaces
+  filter(goslim_names %in% terms) %>%
+  complete(goslim_names = terms, fill = list(n = 0)) %>%
+  mutate(species = "pisaster")
+
+pycno_clean <- pycno_count %>%
+  mutate(goslim_names = str_trim(goslim_names)) %>%  # clean spaces
+  filter(goslim_names %in% terms) %>%
+  complete(goslim_names = terms, fill = list(n = 0)) %>%
+  mutate(species = "pycnopodia")
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r, write out}
+write.csv(derm_clean, "../output/derm_clean_count.csv")
+write.csv(pisaster_clean, "../output/pisaster_clean_count.csv")
+write.csv(pycno_clean, "../output/pycno_clean_count.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r, binding rows}
+
+clean_counts <- bind_rows(derm_clean,pisaster_clean, pycno_clean) # combining the counts for the go_bp slims for the three species 
+write.csv(clean_counts, "../output/full_clean_count.csv")
+
+contingency_table <- clean_counts %>% #Changing my table from long to wide format in order to make my contigency table
+  pivot_wider(
+    names_from = species,
+    values_from = n,
+    values_fill = 0 # When a count is missing for a term, it fills it with 0.
+  )
+
+
+contingency_matrix <- contingency_table %>% # Making the contigency matrix to run my chi-squared test for independence
+  column_to_rownames("goslim_names") %>%
+  as.matrix()
+
+```
+
+```{r, chi-squared test}
+
+chi.test <- chisq.test(contingency_matrix)
+
+
+# Standardized residuals
+chi.test$stdres
+```
+
+

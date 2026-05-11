@@ -1,0 +1,65 @@
+---
+title: "10-Visualization"
+output: pdf_document
+date: "2026-05-03"
+---
+
+### BLAST Statistics
+
+```{r}
+#| label: blast-stats
+#| eval: false
+if (exists("protein_results")) {
+  # BLAST hit quality
+  blast_stats <- protein_results %>%
+    filter(!is.na(pident)) %>%
+    summarise(
+      mean_identity = mean(pident, na.rm = TRUE),
+      median_identity = median(pident, na.rm = TRUE),
+      mean_evalue = mean(as.numeric(evalue), na.rm = TRUE),
+      sequences_with_hits = n()
+    )
+  
+  cat("=== BLAST Hit Quality ===\n")
+  cat("Mean percent identity:", round(blast_stats$mean_identity, 2), "%\n")
+  cat("Median percent identity:", round(blast_stats$median_identity, 2), "%\n")
+  cat("Mean E-value:", format(blast_stats$mean_evalue, scientific = TRUE), "\n") }
+  
+  # Plot identity distribution
+  p2 <- protein_results %>%
+    filter(!is.na(pident)) %>%
+    ggplot(aes(x = pident)) +
+    geom_histogram(bins = 30, fill = "darkgreen", alpha = 0.7) +
+    labs(title = "Distribution of BLAST Percent Identity",
+         x = "Percent Identity (%)",
+         y = "Number of Sequences") +
+    theme_minimal()
+  
+  print(p2)
+  
+
+```
+
+
+```{r}
+library(ggplot2)
+
+res_long <- read.csv("~/Seastar-capstone/output/res_long.csv")
+library(ggplot2)
+
+ggplot(res_long, aes(x = species, y = goslim_names)) +
+  geom_point(aes(size = abs(std_residual), 
+                 color = std_residual)) +
+  scale_size(range = c(2, 10)) +
+  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(
+    x = "Species",
+    y = "GO-slim Terms",
+    size = "|Standardized Residual|",
+    color = "Std Residual"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 8))
+
+
+```

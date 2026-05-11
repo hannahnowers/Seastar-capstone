@@ -1,0 +1,61 @@
+"","goslim_names","species","std_residual"
+"1","anatomical structure development","dermasterias",1.2433534398895
+"2","anatomical structure development","pisaster",-1.72245683986243
+"3","anatomical structure development","pycnopodia",0.522198206511906
+"4","antioxidant activity","dermasterias",-0.805085105843604
+"5","antioxidant activity","pisaster",-0.103017941636835
+"6","antioxidant activity","pycnopodia",0.925037661304862
+"7","carbohydrate metabolic process","dermasterias",0.630143654563753
+"8","carbohydrate metabolic process","pisaster",0.194101445500058
+"9","carbohydrate metabolic process","pycnopodia",-0.841675970950763
+"10","cell differentiation","dermasterias",-0.809566926543377
+"11","cell differentiation","pisaster",0.619111252697832
+"12","cell differentiation","pycnopodia",0.180886423917656
+"13","circulatory system process","dermasterias",1.51562716855651
+"14","circulatory system process","pisaster",-0.398391561461553
+"15","circulatory system process","pycnopodia",-1.12731623127504
+"16","cytokinesis","dermasterias",1.22966276878747
+"17","cytokinesis","pisaster",-0.727967922805923
+"18","cytokinesis","pycnopodia",-0.494977413992836
+"19","defense response to other organism","dermasterias",-3.79988741954204
+"20","defense response to other organism","pisaster",4.31045238005097
+"21","defense response to other organism","pycnopodia",-0.607171676039311
+"22","detoxification","dermasterias",1.07564011578381
+"23","detoxification","pisaster",0.0334744366236786
+"24","detoxification","pycnopodia",-1.127906570994
+"25","digestive system process","dermasterias",0.804567526276003
+"26","digestive system process","pisaster",-0.881418996580574
+"27","digestive system process","pycnopodia",0.0961562334305818
+"28","endocrine process","dermasterias",0.53918445121227
+"29","endocrine process","pisaster",-0.551077554238483
+"30","endocrine process","pycnopodia",0.0233725075310409
+"31","extracellular matrix organization","dermasterias",-1.73252247928623
+"32","extracellular matrix organization","pisaster",1.20818456792912
+"33","extracellular matrix organization","pycnopodia",0.508156010412063
+"34","immune system process","dermasterias",-2.51875044030517
+"35","immune system process","pisaster",3.11879797418318
+"36","immune system process","pycnopodia",-0.673711763109367
+"37","inflammatory response","dermasterias",1.68826081029072
+"38","inflammatory response","pisaster",-0.83035912859605
+"39","inflammatory response","pycnopodia",-0.854902576624643
+"40","lipid binding","dermasterias",1.05690497276621
+"41","lipid binding","pisaster",-0.471723390700337
+"42","lipid binding","pycnopodia",-0.585074593616841
+"43","muscle system process","dermasterias",0.819360781719247
+"44","muscle system process","pisaster",0.0898073628234047
+"45","muscle system process","pycnopodia",-0.925849613313004
+"46","nervous system process","dermasterias",0.0434790939327971
+"47","nervous system process","pisaster",-1.36246894342447
+"48","nervous system process","pycnopodia",1.36842395081004
+"49","reproductive process","dermasterias",0.865198990060681
+"50","reproductive process","pisaster",-2.38632751016594
+"51","reproductive process","pycnopodia",1.59482967277846
+"52","toxin activity","dermasterias",-1.50883781155061
+"53","toxin activity","pisaster",1.39241192789148
+"54","toxin activity","pycnopodia",0.0898120372238022
+"55","virus receptor activity","dermasterias",1.56742054341685
+"56","virus receptor activity","pisaster",-1.1478851370805
+"57","virus receptor activity","pycnopodia",-0.402877426503661
+"58","wound healing","dermasterias",0.146487506785134
+"59","wound healing","pisaster",0.825232021948301
+"60","wound healing","pycnopodia",-1.00448256240991
